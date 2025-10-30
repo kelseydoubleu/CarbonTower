@@ -1,0 +1,1748 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bio-Computational Living Tower | David Benjamin Inspired</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+            background: radial-gradient(ellipse at bottom, #0d1b2a 0%, #000000 100%);
+        }
+        canvas {
+            display: block;
+        }
+        #info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: #00ff88;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 13px;
+            max-width: 320px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+        }
+        #info h2 {
+            margin: 0 0 15px 0;
+            font-size: 16px;
+            color: #00ff88;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        #info p {
+            margin: 8px 0;
+            line-height: 1.6;
+            color: #88ffcc;
+        }
+        .highlight {
+            color: #00ffff;
+            font-weight: bold;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+        #materials-panel {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #00ff88;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 12px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            min-width: 280px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        #materials-panel h3 {
+            margin: 0 0 15px 0;
+            color: #00ffff;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .material-group {
+            margin-bottom: 15px;
+        }
+        .material-group label {
+            display: block;
+            color: #88ffcc;
+            margin-bottom: 5px;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+        .material-group select {
+            width: 100%;
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            color: #00ffff;
+            padding: 8px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+        .material-group select:hover {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: rgba(0, 255, 136, 0.5);
+        }
+        .material-group select option {
+            background: #000000;
+            color: #00ffff;
+        }
+        #carbon-panel {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            color: #00ff88;
+            background: rgba(0, 0, 0, 0.9);
+            padding: 12px 20px;
+            font-size: 11px;
+            backdrop-filter: blur(15px);
+            border-top: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        .carbon-compact {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .carbon-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 8px;
+        }
+        .carbon-title {
+            color: #00ffff;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .total-value {
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 13px;
+        }
+        .total-value.negative {
+            color: #00ff88;
+        }
+        .total-value.positive {
+            color: #ff4444;
+        }
+        .total-secondary {
+            color: #88ffcc;
+            opacity: 0.5;
+        }
+        .carbon-bars-horizontal {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 6px;
+        }
+        .bar-item-h {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+        .bar-label-h {
+            color: #88ffcc;
+            font-size: 9px;
+            text-transform: uppercase;
+        }
+        .bar-wrapper-h {
+            height: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .bar-value-h {
+            color: #00ffff;
+            font-size: 9px;
+            text-align: center;
+        }
+        .carbon-message-compact {
+            font-size: 10px;
+            line-height: 1.3;
+            color: #88ffcc;
+            text-align: center;
+            padding: 4px 0;
+        }
+        .carbon-message-compact.carbon-negative {
+            color: #00ff88;
+        }
+        .carbon-message-compact.carbon-positive {
+            color: #ffaa44;
+        }
+        .carbon-bar {
+            height: 100%;
+            transition: all 0.5s ease;
+            border-radius: 4px;
+        }
+        .carbon-bar.positive {
+            background: linear-gradient(90deg, #ff4444, #ff6666);
+            box-shadow: 0 0 8px rgba(255, 68, 68, 0.5);
+        }
+        .carbon-bar.negative {
+            background: linear-gradient(90deg, #00ff88, #00ffff);
+            box-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+        }
+        #environmental {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: #00ff88;
+            background: rgba(0, 0, 0, 0.85);
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 12px;
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            min-width: 250px;
+        }
+        #environmental h3 {
+            margin: 0 0 10px 0;
+            font-size: 14px;
+            color: #00ffff;
+            text-transform: uppercase;
+        }
+        .metric {
+            margin: 8px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        .bar {
+            height: 4px;
+            background: rgba(0, 255, 136, 0.2);
+            border-radius: 2px;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88, #00ffff);
+            transition: width 0.5s ease;
+            box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .pulsing {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="info">
+        <h2>How do buildings breathe?</h2>
+        <p style="font-size: 12px; line-height: 1.6; margin-bottom: 10px; font-style: italic;">
+            Carbon is invisible. We cannot see the atmosphere thickening, 
+            the molecules accumulating with every beam of steel, every ton of concrete.
+        </p>
+        <p style="font-size: 12px; line-height: 1.6; margin-bottom: 10px;">
+            What if we could see it? What if every material choice revealed itself—
+            emissions rising like smoke, or carbon pulled from the air, 
+            sequestered into the living structure itself?
+        </p>
+        <p style="font-size: 11px; margin-top: 12px; color: #88ffcc;">
+            Select materials. Watch the building breathe.
+        </p>
+        <p style="font-size: 10px; margin-top: 8px;">Drag to rotate • Scroll to zoom</p>
+    </div>
+    
+    <div id="materials-panel">
+        <h3>Material Specifications</h3>
+        
+        <div class="material-group">
+            <label>Floor Slabs</label>
+            <select id="slab-material" onchange="updateMaterials()">
+                <option value="concrete">Concrete (400 kg CO₂e/m³)</option>
+                <option value="clt">Cross-Laminated Timber (-180 kg CO₂e/m³)</option>
+                <option value="hempcrete">Hempcrete (-110 kg CO₂e/m³)</option>
+            </select>
+        </div>
+
+        <div class="material-group">
+            <label>Structure (Columns/Beams)</label>
+            <select id="structure-material" onchange="updateMaterials()">
+                <option value="steel">Steel (2,100 kg CO₂e/m³)</option>
+                <option value="glulam">Glulam Timber (-300 kg CO₂e/m³)</option>
+                <option value="bamboo">Bamboo Composite (-400 kg CO₂e/m³)</option>
+            </select>
+        </div>
+
+        <div class="material-group">
+            <label>Facade System</label>
+            <select id="facade-material" onchange="updateMaterials()">
+                <option value="glass-aluminum">Glass Curtain Wall (250 kg CO₂e/m²)</option>
+                <option value="timber-glass">Timber + Triple Glazing (80 kg CO₂e/m²)</option>
+                <option value="mycelium">Mycelium Bricks + Bio-resin (-45 kg CO₂e/m²)</option>
+            </select>
+        </div>
+
+        <div class="material-group">
+            <label>Interior Finishes</label>
+            <select id="interior-material" onchange="updateMaterials()">
+                <option value="gypsum">Gypsum + Vinyl (35 kg CO₂e/m²)</option>
+                <option value="plywood">Plywood + Low-VOC (18 kg CO₂e/m²)</option>
+                <option value="rice-straw">Rice Straw MDF (-8 kg CO₂e/m²)</option>
+            </select>
+        </div>
+
+        <div class="material-group">
+            <label>Furniture System</label>
+            <select id="furniture-material" onchange="updateMaterials()">
+                <option value="conventional">Conventional (10yr cycle, 25 kg CO₂e/m²)</option>
+                <option value="modular">Durable Modular (20yr cycle, 15 kg CO₂e/m²)</option>
+                <option value="mycelium-furn">Mycelium Circular (15yr, -5 kg CO₂e/m²)</option>
+            </select>
+        </div>
+    </div>
+
+    <div id="carbon-panel">
+        <div class="carbon-compact">
+            <div class="carbon-header">
+                <span class="carbon-title">CARBON (50yr):</span>
+                <span class="total-value" id="carbon-total">0 tons CO₂e</span>
+                <span class="total-secondary">|</span>
+                <span class="total-value" id="carbon-per-sqm">0 kg/m²</span>
+            </div>
+            <div class="carbon-bars-horizontal">
+                <div class="bar-item-h">
+                    <span class="bar-label-h">Slabs</span>
+                    <div class="bar-wrapper-h"><div class="carbon-bar" id="bar-slabs"></div></div>
+                    <span class="bar-value-h" id="carbon-slabs">0</span>
+                </div>
+                <div class="bar-item-h">
+                    <span class="bar-label-h">Structure</span>
+                    <div class="bar-wrapper-h"><div class="carbon-bar" id="bar-structure"></div></div>
+                    <span class="bar-value-h" id="carbon-structure">0</span>
+                </div>
+                <div class="bar-item-h">
+                    <span class="bar-label-h">Facade</span>
+                    <div class="bar-wrapper-h"><div class="carbon-bar" id="bar-facade"></div></div>
+                    <span class="bar-value-h" id="carbon-facade">0</span>
+                </div>
+                <div class="bar-item-h">
+                    <span class="bar-label-h">Interior</span>
+                    <div class="bar-wrapper-h"><div class="carbon-bar" id="bar-interior"></div></div>
+                    <span class="bar-value-h" id="carbon-interior">0</span>
+                </div>
+                <div class="bar-item-h">
+                    <span class="bar-label-h">Furniture</span>
+                    <div class="bar-wrapper-h"><div class="carbon-bar" id="bar-furniture"></div></div>
+                    <span class="bar-value-h" id="carbon-furniture">0</span>
+                </div>
+            </div>
+            <div id="carbon-message" class="carbon-message-compact"></div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x000000);
+        scene.fog = new THREE.FogExp2(0x000816, 0.008);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(25, 35, 40);
+        camera.lookAt(0, 25, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+
+        // Advanced Lighting System
+        const ambientLight = new THREE.AmbientLight(0x88ffcc, 0.3);
+        scene.add(ambientLight);
+
+        const mainLight = new THREE.DirectionalLight(0x00ff88, 0.6);
+        mainLight.position.set(20, 40, 20);
+        mainLight.castShadow = true;
+        mainLight.shadow.mapSize.width = 2048;
+        mainLight.shadow.mapSize.height = 2048;
+        mainLight.shadow.camera.far = 100;
+        scene.add(mainLight);
+
+        const bioLight1 = new THREE.PointLight(0x00ffff, 0.8, 50);
+        bioLight1.position.set(-10, 20, 10);
+        scene.add(bioLight1);
+
+        const bioLight2 = new THREE.PointLight(0x00ff88, 0.6, 50);
+        bioLight2.position.set(10, 15, -10);
+        scene.add(bioLight2);
+
+        const topLight = new THREE.PointLight(0xffffff, 0.4, 100);
+        topLight.position.set(0, 50, 0);
+        scene.add(topLight);
+
+        // Organic ground with texture
+        const groundGeometry = new THREE.PlaneGeometry(150, 150, 50, 50);
+        const vertices = groundGeometry.attributes.position.array;
+        for (let i = 0; i < vertices.length; i += 3) {
+            vertices[i + 2] = Math.sin(vertices[i] * 0.1) * Math.cos(vertices[i + 1] * 0.1) * 0.5;
+        }
+        groundGeometry.computeVertexNormals();
+        
+        const groundMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x0a3d2e,
+            roughness: 0.9,
+            metalness: 0.1,
+            wireframe: false,
+            emissive: 0x00ff88,
+            emissiveIntensity: 0.05
+        });
+        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+        ground.rotation.x = -Math.PI / 2;
+        ground.receiveShadow = true;
+        scene.add(ground);
+
+        // Particle system for carbon visualization
+        let particleCount = 5000; // Will change based on carbon
+        let maxParticles = 10000;
+        const particleGeometry = new THREE.BufferGeometry();
+        const particlePositions = new Float32Array(maxParticles * 3);
+        const particleVelocities = [];
+        let currentCarbonLevel = 0; // Positive = emissions, Negative = sequestration
+
+        // Initialize particles
+        for (let i = 0; i < maxParticles * 3; i += 3) {
+            particlePositions[i] = (Math.random() - 0.5) * 100;
+            particlePositions[i + 1] = Math.random() * 60;
+            particlePositions[i + 2] = (Math.random() - 0.5) * 100;
+            
+            particleVelocities.push({
+                x: (Math.random() - 0.5) * 0.02,
+                y: Math.random() * 0.02 + 0.01, // Default: rising (emissions)
+                z: (Math.random() - 0.5) * 0.02,
+                baseY: Math.random() * 0.02 + 0.01
+            });
+        }
+
+        particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+        const particleMaterial = new THREE.PointsMaterial({
+            color: 0x666666, // Gray for carbon
+            size: 0.4,
+            transparent: true,
+            opacity: 0.6,
+            blending: THREE.AdditiveBlending
+        });
+        const particleSystem = new THREE.Points(particleGeometry, particleMaterial);
+        scene.add(particleSystem);
+
+        function updateCarbonParticles(carbonFootprint) {
+            // Calculate particle count based on carbon footprint
+            // More carbon = more particles
+            const totalCarbon = carbonFootprint.total; // in kg
+            const carbonIntensity = carbonFootprint.perSqm; // kg per m²
+            
+            currentCarbonLevel = totalCarbon;
+            
+            // Map carbon to particle count (0 to 10000 particles)
+            // -500 tons = 500 particles (carbon negative, very few)
+            // 0 tons = 2000 particles (neutral)
+            // +2000 tons = 10000 particles (very carbon positive, many)
+            
+            if (totalCarbon < 0) {
+                // Carbon negative: fewer particles, they get sucked toward building
+                particleCount = Math.max(500, 2000 + (totalCarbon / 1000) * 3000);
+                particleMaterial.color.setHex(0x00ff88); // Green tint
+                particleMaterial.opacity = 0.3;
+                particleMaterial.size = 0.3;
+            } else if (totalCarbon < 1000000) {
+                // Low carbon: moderate particles
+                particleCount = 2000 + (totalCarbon / 1000000) * 3000;
+                particleMaterial.color.setHex(0x888888); // Gray
+                particleMaterial.opacity = 0.5;
+                particleMaterial.size = 0.4;
+            } else {
+                // High carbon: many particles rising
+                particleCount = Math.min(maxParticles, 5000 + (totalCarbon / 1000000) * 5000);
+                particleMaterial.color.setHex(0xaa6666); // Reddish gray
+                particleMaterial.opacity = 0.7;
+                particleMaterial.size = 0.5;
+            }
+            
+            // Update particle behavior
+            const buildingCenter = new THREE.Vector3(0, currentLevel * FLOOR_HEIGHT / 2, 0);
+            
+            for (let i = 0; i < particleVelocities.length; i++) {
+                if (totalCarbon < 0) {
+                    // Carbon negative: particles get AGGRESSIVELY pulled toward building (sequestration)
+                    const particlePos = new THREE.Vector3(
+                        particlePositions[i * 3],
+                        particlePositions[i * 3 + 1],
+                        particlePositions[i * 3 + 2]
+                    );
+                    const direction = buildingCenter.clone().sub(particlePos).normalize();
+                    const distance = particlePos.distanceTo(buildingCenter);
+                    
+                    // MUCH STRONGER PULL - increased base pull dramatically
+                    // Max pull increased from 0.05 to 0.4
+                    // Pull formula changed to be stronger overall
+                    const pullStrength = Math.min(0.4, 25 / Math.max(distance, 3));
+                    
+                    particleVelocities[i].x = direction.x * pullStrength;
+                    particleVelocities[i].y = direction.y * pullStrength; // Full vertical pull too!
+                    particleVelocities[i].z = direction.z * pullStrength;
+                } else {
+                    // Carbon positive: particles rise (emissions)
+                    const emissionStrength = Math.min(1, totalCarbon / 2000000);
+                    particleVelocities[i].y = particleVelocities[i].baseY * (1 + emissionStrength);
+                    particleVelocities[i].x = (Math.random() - 0.5) * 0.02;
+                    particleVelocities[i].z = (Math.random() - 0.5) * 0.02;
+                }
+            }
+        }
+
+        // Mycelium network lines
+        const myceliumLines = [];
+        function createMyceliumNetwork() {
+            for (let i = 0; i < 100; i++) {
+                const points = [];
+                const startX = (Math.random() - 0.5) * 20;
+                const startZ = (Math.random() - 0.5) * 20;
+                
+                for (let j = 0; j < 20; j++) {
+                    points.push(new THREE.Vector3(
+                        startX + (Math.random() - 0.5) * 15,
+                        j * 0.7 + Math.random() * 2,
+                        startZ + (Math.random() - 0.5) * 15
+                    ));
+                }
+                
+                const geometry = new THREE.BufferGeometry().setFromPoints(points);
+                const material = new THREE.LineBasicMaterial({
+                    color: 0x00ff88,
+                    transparent: true,
+                    opacity: 0.15,
+                    blending: THREE.AdditiveBlending
+                });
+                const line = new THREE.Line(geometry, material);
+                myceliumLines.push(line);
+                scene.add(line);
+            }
+        }
+        createMyceliumNetwork();
+
+        // Bio-computational block configuration
+        const BLOCK_LENGTH = 3;
+        const BLOCK_WIDTH = 1;
+        const BLOCK_HEIGHT = 0.5;
+        const BLOCKS_PER_LEVEL = 3;
+        const INITIAL_LEVELS = 18;
+        const FLOOR_HEIGHT = 3; // Height between floors
+        const SLAB_THICKNESS = 0.3;
+        const COLUMN_RADIUS = 0.2;
+        const BEAM_WIDTH = 0.3;
+
+        let jengaBlocks = [];
+        let structuralElements = [];
+        let floorSlabs = [];
+        let currentLevel = 0;
+        let removedCount = 0;
+        let reusedCount = 0;
+        let isAnimating = false;
+        let time = 0;
+
+        // Material carbon database (kg CO2e per unit)
+        const materialDatabase = {
+            slabs: {
+                concrete: { intensity: 400, unit: 'm³', color: 0x1a1a1a },
+                clt: { intensity: -180, unit: 'm³', color: 0x8b6f47 },
+                hempcrete: { intensity: -110, unit: 'm³', color: 0xa0a080 }
+            },
+            structure: {
+                steel: { intensity: 2100, unit: 'm³', color: 0x2c3e50 },
+                glulam: { intensity: -300, unit: 'm³', color: 0x8b6f47 },
+                bamboo: { intensity: -400, unit: 'm³', color: 0x9db891 }
+            },
+            facade: {
+                'glass-aluminum': { intensity: 250, unit: 'm²', color: 0x87ceeb },
+                'timber-glass': { intensity: 80, unit: 'm²', color: 0x8b7355 },
+                mycelium: { intensity: -45, unit: 'm²', color: 0xf5f5dc }
+            },
+            interior: {
+                gypsum: { intensity: 35, unit: 'm²', color: 0xffffff },
+                plywood: { intensity: 18, unit: 'm²', color: 0xdeb887 },
+                'rice-straw': { intensity: -8, unit: 'm²', color: 0xf0e68c }
+            },
+            furniture: {
+                conventional: { intensity: 25, unit: 'm²', replacementYears: 10 },
+                modular: { intensity: 15, unit: 'm²', replacementYears: 20 },
+                'mycelium-furn': { intensity: -5, unit: 'm²', replacementYears: 15 }
+            }
+        };
+
+        // Current material selections
+        let currentMaterials = {
+            slab: 'concrete',
+            structure: 'steel',
+            facade: 'glass-aluminum',
+            interior: 'gypsum',
+            furniture: 'conventional'
+        };
+
+        // Building dimensions
+        const FLOOR_AREA = 144; // 12m x 12m = 144 m²
+        const PERIMETER = 48; // 4 * 12m
+        const LIFECYCLE_YEARS = 50;
+
+        function calculateCarbonFootprint() {
+            const floors = currentLevel;
+            
+            // Floor slabs
+            const slabVolume = FLOOR_AREA * SLAB_THICKNESS * floors;
+            const slabCarbon = slabVolume * materialDatabase.slabs[currentMaterials.slab].intensity;
+            
+            // Structure (columns + beams)
+            const columnVolume = columnPositions.length * Math.PI * Math.pow(COLUMN_RADIUS, 2) * (floors * FLOOR_HEIGHT);
+            const beamVolume = (6 * 12 * BEAM_WIDTH * BEAM_WIDTH * floors); // Approximate beam volume
+            const structureVolume = columnVolume + beamVolume;
+            const structureCarbon = structureVolume * materialDatabase.structure[currentMaterials.structure].intensity;
+            
+            // Facade
+            const facadeArea = PERIMETER * (floors * FLOOR_HEIGHT);
+            const facadeCarbon = facadeArea * materialDatabase.facade[currentMaterials.facade].intensity;
+            
+            // Interior finishes (walls, ceilings, floors)
+            const interiorArea = FLOOR_AREA * 3 * floors; // Floor + ceiling + partition walls
+            const interiorCarbon = interiorArea * materialDatabase.interior[currentMaterials.interior].intensity;
+            
+            // Furniture (with replacement cycle over 50 years)
+            const furnitureData = materialDatabase.furniture[currentMaterials.furniture];
+            const replacementCycles = Math.floor(LIFECYCLE_YEARS / furnitureData.replacementYears);
+            const furnitureCarbon = FLOOR_AREA * floors * furnitureData.intensity * replacementCycles;
+            
+            // Total
+            const totalCarbon = slabCarbon + structureCarbon + facadeCarbon + interiorCarbon + furnitureCarbon;
+            const carbonPerSqm = totalCarbon / (FLOOR_AREA * floors);
+            
+            return {
+                slabs: slabCarbon,
+                structure: structureCarbon,
+                facade: facadeCarbon,
+                interior: interiorCarbon,
+                furniture: furnitureCarbon,
+                total: totalCarbon,
+                perSqm: carbonPerSqm,
+                totalArea: FLOOR_AREA * floors
+            };
+        }
+
+        function updateCarbonDisplay() {
+            const carbon = calculateCarbonFootprint();
+            
+            // Update individual metrics
+            updateCarbonMetric('slabs', carbon.slabs);
+            updateCarbonMetric('structure', carbon.structure);
+            updateCarbonMetric('facade', carbon.facade);
+            updateCarbonMetric('interior', carbon.interior);
+            updateCarbonMetric('furniture', carbon.furniture);
+            
+            // Update total
+            const totalElement = document.getElementById('carbon-total');
+            const perSqmElement = document.getElementById('carbon-per-sqm');
+            
+            totalElement.textContent = `${(carbon.total / 1000).toFixed(1)} tons CO₂e`;
+            perSqmElement.textContent = `${carbon.perSqm.toFixed(1)} kg CO₂e/m²`;
+            
+            if (carbon.total < 0) {
+                totalElement.classList.add('negative');
+                totalElement.classList.remove('positive');
+            } else {
+                totalElement.classList.add('positive');
+                totalElement.classList.remove('negative');
+            }
+            
+            // Update message
+            updateCarbonMessage(carbon);
+            
+            // Update particle system to visualize carbon
+            updateCarbonParticles(carbon);
+        }
+
+        function updateCarbonMetric(id, value) {
+            const valueElement = document.getElementById(`carbon-${id}`);
+            const barElement = document.getElementById(`bar-${id}`);
+            
+            const absValue = Math.abs(value);
+            const displayValue = value < 0 ? 
+                `-${(absValue / 1000).toFixed(1)} tons (sequestered)` : 
+                `+${(absValue / 1000).toFixed(1)} tons`;
+            
+            valueElement.textContent = displayValue;
+            
+            // Bar visualization (normalized to max 500 tons for scale)
+            const maxScale = 500000;
+            const percentage = Math.min((absValue / maxScale) * 100, 100);
+            barElement.style.width = percentage + '%';
+            
+            if (value < 0) {
+                barElement.classList.add('negative');
+                barElement.classList.remove('positive');
+            } else {
+                barElement.classList.add('positive');
+                barElement.classList.remove('negative');
+            }
+        }
+
+        function updateCarbonMessage(carbon) {
+            const messageElement = document.getElementById('carbon-message');
+            
+            if (carbon.total < 0) {
+                messageElement.className = 'carbon-message-compact carbon-negative';
+                messageElement.innerHTML = `CARBON NEGATIVE! Sequesters ${Math.abs(carbon.total / 1000).toFixed(1)} tons CO₂ over 50 years.`;
+            } else if (carbon.perSqm < 500) {
+                messageElement.className = 'carbon-message-compact carbon-positive';
+                messageElement.innerHTML = `Low carbon (below 500 kg/m²). Consider bio-materials for carbon negativity.`;
+            } else {
+                messageElement.className = 'carbon-message-compact carbon-positive';
+                messageElement.innerHTML = `High carbon. Switch to timber/bio-materials to reduce by 60-80%.`;
+            }
+        }
+
+        function updateMaterials() {
+            // Get selected materials
+            currentMaterials.slab = document.getElementById('slab-material').value;
+            currentMaterials.structure = document.getElementById('structure-material').value;
+            const newFacade = document.getElementById('facade-material').value;
+            currentMaterials.interior = document.getElementById('interior-material').value;
+            currentMaterials.furniture = document.getElementById('furniture-material').value;
+            
+            // Update visual materials
+            updateVisualMaterials();
+            
+            // Update facade if changed
+            if (newFacade !== currentMaterials.facade) {
+                currentMaterials.facade = newFacade;
+                updateFacadeSystem(newFacade);
+            }
+            
+            // Recalculate carbon
+            updateCarbonDisplay();
+        }
+
+        function updateVisualMaterials() {
+            // Update floor slab colors
+            const slabColor = materialDatabase.slabs[currentMaterials.slab].color;
+            floorSlabs.forEach(slab => {
+                slab.mesh.material.color.setHex(slabColor);
+            });
+            
+            // Update structural colors
+            const structureColor = materialDatabase.structure[currentMaterials.structure].color;
+            coreColumns.forEach(column => {
+                column.mesh.material.color.setHex(structureColor);
+            });
+            structuralElements.forEach(beam => {
+                beam.mesh.material.color.setHex(structureColor);
+            });
+        }
+
+        // Facade system
+        let facadePanels = [];
+        let currentFacadeType = 'glass-aluminum';
+
+        class FacadePanel {
+            constructor(x, y, z, width, height, rotation, facadeType) {
+                this.facadeType = facadeType;
+                this.meshes = [];
+                
+                if (facadeType === 'glass-aluminum') {
+                    this.createGlassCurtainWall(x, y, z, width, height, rotation);
+                } else if (facadeType === 'timber-glass') {
+                    this.createTimberFacade(x, y, z, width, height, rotation);
+                } else if (facadeType === 'mycelium') {
+                    this.createMyceliumBricks(x, y, z, width, height, rotation);
+                }
+            }
+
+            createGlassCurtainWall(x, y, z, width, height, rotation) {
+                // Main glass panel
+                const glassGeometry = new THREE.BoxGeometry(width, height, 0.05);
+                const glassMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x87ceeb,
+                    metalness: 0.9,
+                    roughness: 0.1,
+                    transparent: true,
+                    opacity: 0.4,
+                    side: THREE.DoubleSide
+                });
+                const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+                glass.position.set(x, y, z);
+                glass.rotation.y = rotation;
+                glass.castShadow = false;
+                glass.receiveShadow = true;
+                scene.add(glass);
+                this.meshes.push(glass);
+
+                // Aluminum mullions (vertical and horizontal)
+                const mullionMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xcccccc,
+                    metalness: 0.8,
+                    roughness: 0.3
+                });
+
+                // Vertical mullions
+                for (let i = -1; i <= 1; i++) {
+                    const mullionGeometry = new THREE.BoxGeometry(0.08, height, 0.08);
+                    const mullion = new THREE.Mesh(mullionGeometry, mullionMaterial);
+                    const offsetX = Math.cos(rotation) * (i * width / 3);
+                    const offsetZ = Math.sin(rotation) * (i * width / 3);
+                    mullion.position.set(x + offsetX, y, z + offsetZ);
+                    mullion.rotation.y = rotation;
+                    mullion.castShadow = true;
+                    scene.add(mullion);
+                    this.meshes.push(mullion);
+                }
+
+                // Horizontal mullions
+                for (let i = -1; i <= 1; i++) {
+                    const mullionGeometry = new THREE.BoxGeometry(width, 0.08, 0.08);
+                    const mullion = new THREE.Mesh(mullionGeometry, mullionMaterial);
+                    mullion.position.set(x, y + (i * height / 3), z);
+                    mullion.rotation.y = rotation;
+                    mullion.castShadow = true;
+                    scene.add(mullion);
+                    this.meshes.push(mullion);
+                }
+            }
+
+            createTimberFacade(x, y, z, width, height, rotation) {
+                // Timber slat system with glass behind
+                const timberMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x8b6f47,
+                    roughness: 0.9,
+                    metalness: 0.1
+                });
+
+                // Background glass
+                const glassGeometry = new THREE.BoxGeometry(width, height, 0.03);
+                const glassMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x6ba3c4,
+                    metalness: 0.5,
+                    roughness: 0.2,
+                    transparent: true,
+                    opacity: 0.3
+                });
+                const glass = new THREE.Mesh(glassGeometry, glassMaterial);
+                glass.position.set(x, y, z);
+                glass.rotation.y = rotation;
+                scene.add(glass);
+                this.meshes.push(glass);
+
+                // Vertical timber slats
+                const slatCount = 8;
+                const slatWidth = 0.15;
+                const slatDepth = 0.08;
+                
+                for (let i = 0; i < slatCount; i++) {
+                    const slatGeometry = new THREE.BoxGeometry(slatWidth, height, slatDepth);
+                    const slat = new THREE.Mesh(slatGeometry, timberMaterial);
+                    
+                    const offset = (i - slatCount / 2) * (width / slatCount);
+                    const offsetX = Math.cos(rotation) * offset;
+                    const offsetZ = Math.sin(rotation) * offset;
+                    const outwardX = Math.cos(rotation + Math.PI / 2) * 0.1;
+                    const outwardZ = Math.sin(rotation + Math.PI / 2) * 0.1;
+                    
+                    slat.position.set(x + offsetX + outwardX, y, z + offsetZ + outwardZ);
+                    slat.rotation.y = rotation;
+                    slat.castShadow = true;
+                    slat.receiveShadow = true;
+                    scene.add(slat);
+                    this.meshes.push(slat);
+                }
+            }
+
+            createMyceliumBricks(x, y, z, width, height, rotation) {
+                // Organic brick pattern inspired by Studio Gang with asymmetric windows
+                const brickMaterial = new THREE.MeshStandardMaterial({
+                    color: 0xf5f5dc,
+                    roughness: 0.8,
+                    metalness: 0.1
+                });
+
+                const windowMaterial = new THREE.MeshStandardMaterial({
+                    color: 0x4a6fa5,
+                    metalness: 0.5,
+                    roughness: 0.3,
+                    transparent: true,
+                    opacity: 0.4
+                });
+
+                const brickWidth = 0.4;
+                const brickHeight = 0.25;
+                const brickDepth = 0.2;
+                const brickSpacing = 0.05;
+
+                const bricksX = Math.floor(width / (brickWidth + brickSpacing));
+                const bricksY = Math.floor(height / (brickHeight + brickSpacing));
+
+                // Create organic window openings (asymmetric)
+                const windowCount = Math.floor(Math.random() * 3) + 2; // 2-4 windows per panel
+                const windows = [];
+                for (let w = 0; w < windowCount; w++) {
+                    windows.push({
+                        centerX: (Math.random() - 0.5) * width * 0.6,
+                        centerY: (Math.random() - 0.5) * height * 0.6,
+                        radiusX: 0.8 + Math.random() * 0.8,
+                        radiusY: 0.6 + Math.random() * 1.0,
+                        rotation: Math.random() * Math.PI
+                    });
+                }
+
+                for (let row = 0; row < bricksY; row++) {
+                    // Organic undulating offset instead of simple running bond
+                    const waveOffset = Math.sin(row * 0.5) * (brickWidth / 3);
+                    
+                    for (let col = 0; col < bricksX; col++) {
+                        const localX = (col * (brickWidth + brickSpacing)) - (width / 2) + waveOffset;
+                        const localY = (row * (brickHeight + brickSpacing)) - (height / 2);
+                        
+                        // Check if brick is in a window opening
+                        let inWindow = false;
+                        for (const window of windows) {
+                            const dx = (localX - window.centerX) * Math.cos(window.rotation) - 
+                                      (localY - window.centerY) * Math.sin(window.rotation);
+                            const dy = (localX - window.centerX) * Math.sin(window.rotation) + 
+                                      (localY - window.centerY) * Math.cos(window.rotation);
+                            
+                            if ((dx * dx) / (window.radiusX * window.radiusX) + 
+                                (dy * dy) / (window.radiusY * window.radiusY) < 1) {
+                                inWindow = true;
+                                break;
+                            }
+                        }
+                        
+                        if (inWindow) {
+                            // Create glass window element
+                            const glassGeometry = new THREE.BoxGeometry(
+                                brickWidth * 0.9,
+                                brickHeight * 0.9,
+                                0.05
+                            );
+                            const glass = new THREE.Mesh(glassGeometry, windowMaterial);
+                            
+                            const offsetX = Math.cos(rotation) * localX;
+                            const offsetZ = Math.sin(rotation) * localX;
+                            const outwardX = Math.cos(rotation + Math.PI / 2) * 0.1;
+                            const outwardZ = Math.sin(rotation + Math.PI / 2) * 0.1;
+                            
+                            glass.position.set(
+                                x + offsetX + outwardX,
+                                y + localY,
+                                z + offsetZ + outwardZ
+                            );
+                            glass.rotation.y = rotation;
+                            glass.receiveShadow = true;
+                            scene.add(glass);
+                            this.meshes.push(glass);
+                            continue;
+                        }
+                        
+                        // Create heavily organic brick geometry
+                        const geometry = new THREE.BoxGeometry(
+                            brickWidth,
+                            brickHeight,
+                            brickDepth,
+                            4, 3, 3 // More subdivisions for more organic deformation
+                        );
+                        
+                        // CRAZY organic deformation
+                        const positions = geometry.attributes.position;
+                        for (let i = 0; i < positions.count; i++) {
+                            const vx = positions.getX(i);
+                            const vy = positions.getY(i);
+                            const vz = positions.getZ(i);
+                            
+                            // Multiple layers of organic warping
+                            const warp1 = Math.sin(vx * 8 + row * 0.7) * Math.cos(vy * 6 + col * 0.5) * 0.08;
+                            const warp2 = Math.sin(vy * 10 + row * 1.2) * 0.05;
+                            const warp3 = Math.cos(vx * 5 + vy * 5) * 0.04;
+                            const totalWarp = warp1 + warp2 + warp3;
+                            
+                            // Also warp in X and Y for more organic feel
+                            positions.setX(i, vx * (1 + Math.sin(vy * 3) * 0.1));
+                            positions.setY(i, vy * (1 + Math.cos(vx * 4) * 0.08));
+                            positions.setZ(i, vz + totalWarp);
+                        }
+                        geometry.computeVertexNormals();
+
+                        const brick = new THREE.Mesh(geometry, brickMaterial);
+                        
+                        const offsetX = Math.cos(rotation) * localX;
+                        const offsetZ = Math.sin(rotation) * localX;
+                        
+                        // Variable depth - bricks protrude at different amounts
+                        const depthVariation = 0.1 + Math.abs(Math.sin(row * 0.7 + col * 0.5)) * 0.15;
+                        const outwardX = Math.cos(rotation + Math.PI / 2) * depthVariation;
+                        const outwardZ = Math.sin(rotation + Math.PI / 2) * depthVariation;
+                        
+                        brick.position.set(
+                            x + offsetX + outwardX,
+                            y + localY,
+                            z + offsetZ + outwardZ
+                        );
+                        brick.rotation.y = rotation;
+                        
+                        // More aggressive random rotations
+                        brick.rotation.x += (Math.random() - 0.5) * 0.15;
+                        brick.rotation.z += (Math.random() - 0.5) * 0.15;
+                        brick.rotation.y += (Math.random() - 0.5) * 0.08;
+                        
+                        brick.castShadow = true;
+                        brick.receiveShadow = true;
+                        scene.add(brick);
+                        this.meshes.push(brick);
+                    }
+                }
+            }
+
+            remove() {
+                this.meshes.forEach(mesh => {
+                    scene.remove(mesh);
+                    if (mesh.geometry) mesh.geometry.dispose();
+                    if (mesh.material) mesh.material.dispose();
+                });
+                this.meshes = [];
+            }
+        }
+
+        function createBuildingFacade(levels) {
+            const panelWidth = 12;
+            const panelHeight = FLOOR_HEIGHT;
+            
+            for (let level = 0; level < levels; level++) {
+                const y = level * FLOOR_HEIGHT;
+                
+                // Four sides of the building
+                const sides = [
+                    { x: 0, z: -6, rotation: 0 },      // North
+                    { x: 6, z: 0, rotation: Math.PI / 2 },   // East
+                    { x: 0, z: 6, rotation: Math.PI },       // South
+                    { x: -6, z: 0, rotation: -Math.PI / 2 }  // West
+                ];
+                
+                sides.forEach(side => {
+                    const panel = new FacadePanel(
+                        side.x, y + panelHeight / 2, side.z,
+                        panelWidth, panelHeight,
+                        side.rotation,
+                        currentFacadeType
+                    );
+                    facadePanels.push(panel);
+                });
+            }
+        }
+
+        function updateFacadeSystem(newFacadeType) {
+            if (newFacadeType === currentFacadeType) return;
+            
+            currentFacadeType = newFacadeType;
+            
+            // Remove old facade
+            facadePanels.forEach(panel => panel.remove());
+            facadePanels = [];
+            
+            // Create new facade
+            createBuildingFacade(currentLevel);
+        }
+
+        // Structural column class
+        class Column {
+            constructor(x, z, height) {
+                const geometry = new THREE.CylinderGeometry(COLUMN_RADIUS, COLUMN_RADIUS, height, 12);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x2c3e50,
+                    metalness: 0.8,
+                    roughness: 0.2,
+                    emissive: 0x00ff88,
+                    emissiveIntensity: 0.1
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(x, height / 2, z);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+            }
+
+            updateHeight(newHeight) {
+                const oldGeometry = this.mesh.geometry;
+                this.mesh.geometry = new THREE.CylinderGeometry(COLUMN_RADIUS, COLUMN_RADIUS, newHeight, 12);
+                this.mesh.position.y = newHeight / 2;
+                oldGeometry.dispose();
+            }
+        }
+
+        // Structural beam class
+        class Beam {
+            constructor(x1, y, z1, x2, z2) {
+                const length = Math.sqrt((x2 - x1) ** 2 + (z2 - z1) ** 2);
+                const geometry = new THREE.BoxGeometry(length, BEAM_WIDTH, BEAM_WIDTH);
+                const material = new THREE.MeshStandardMaterial({
+                    color: 0x34495e,
+                    metalness: 0.7,
+                    roughness: 0.3,
+                    emissive: 0x00ff88,
+                    emissiveIntensity: 0.05
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set((x1 + x2) / 2, y, (z1 + z2) / 2);
+                
+                const angle = Math.atan2(z2 - z1, x2 - x1);
+                this.mesh.rotation.y = angle;
+                
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                scene.add(this.mesh);
+            }
+        }
+
+        // Floor slab class
+        class FloorSlab {
+            constructor(level, isActive = true) {
+                const size = 12;
+                const geometry = new THREE.BoxGeometry(size, SLAB_THICKNESS, size);
+                const material = new THREE.MeshStandardMaterial({
+                    color: isActive ? 0x1a1a1a : 0x2c3e50,
+                    metalness: 0.6,
+                    roughness: 0.4,
+                    transparent: true,
+                    opacity: isActive ? 0.9 : 0.7,
+                    emissive: 0x00ff88,
+                    emissiveIntensity: isActive ? 0.1 : 0.05
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(0, level * FLOOR_HEIGHT, 0);
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                this.level = level;
+                this.isActive = isActive;
+                scene.add(this.mesh);
+            }
+
+            pulse(time) {
+                if (this.isActive) {
+                    const pulse = Math.sin(time * 2 + this.level * 0.3) * 0.05;
+                    this.mesh.material.emissiveIntensity = 0.1 + pulse;
+                }
+            }
+        }
+
+        // Core structural system
+        const coreColumns = [];
+        const columnPositions = [
+            [-4, -4], [4, -4], [-4, 4], [4, 4],  // Corner columns
+            [-4, 0], [4, 0], [0, -4], [0, 4]      // Mid-span columns
+        ];
+
+        function createStructuralSystem(levels) {
+            const totalHeight = levels * FLOOR_HEIGHT;
+            
+            // Create columns
+            columnPositions.forEach(([x, z]) => {
+                const column = new Column(x, z, totalHeight);
+                coreColumns.push(column);
+            });
+
+            // Create beams and floor slabs for each level
+            for (let i = 0; i < levels; i++) {
+                const y = i * FLOOR_HEIGHT;
+                
+                // Perimeter beams
+                structuralElements.push(new Beam(-4, y, -4, 4, -4));
+                structuralElements.push(new Beam(4, y, -4, 4, 4));
+                structuralElements.push(new Beam(4, y, 4, -4, 4));
+                structuralElements.push(new Beam(-4, y, 4, -4, -4));
+                
+                // Cross beams
+                structuralElements.push(new Beam(-4, y, 0, 4, 0));
+                structuralElements.push(new Beam(0, y, -4, 0, 4));
+                
+                // Floor slab
+                const slab = new FloorSlab(i, i % 3 === 0);
+                floorSlabs.push(slab);
+            }
+        }
+
+        function updateStructuralSystem(newLevels) {
+            const totalHeight = newLevels * FLOOR_HEIGHT;
+            
+            // Update column heights
+            coreColumns.forEach(column => {
+                column.updateHeight(totalHeight);
+            });
+
+            // Add new beams and slabs for new levels
+            const existingLevels = Math.floor(structuralElements.length / 6);
+            for (let i = existingLevels; i < newLevels; i++) {
+                const y = i * FLOOR_HEIGHT;
+                
+                structuralElements.push(new Beam(-4, y, -4, 4, -4));
+                structuralElements.push(new Beam(4, y, -4, 4, 4));
+                structuralElements.push(new Beam(4, y, 4, -4, 4));
+                structuralElements.push(new Beam(-4, y, 4, -4, -4));
+                structuralElements.push(new Beam(-4, y, 0, 4, 0));
+                structuralElements.push(new Beam(0, y, -4, 0, 4));
+                
+                const slab = new FloorSlab(i, i % 3 === 0);
+                floorSlabs.push(slab);
+                
+                // Add facade for new level
+                const panelWidth = 12;
+                const panelHeight = FLOOR_HEIGHT;
+                const sides = [
+                    { x: 0, z: -6, rotation: 0 },
+                    { x: 6, z: 0, rotation: Math.PI / 2 },
+                    { x: 0, z: 6, rotation: Math.PI },
+                    { x: -6, z: 0, rotation: -Math.PI / 2 }
+                ];
+                
+                sides.forEach(side => {
+                    const panel = new FacadePanel(
+                        side.x, y + panelHeight / 2, side.z,
+                        panelWidth, panelHeight,
+                        side.rotation,
+                        currentFacadeType
+                    );
+                    facadePanels.push(panel);
+                });
+            }
+        }
+
+        // Advanced bio-material block class
+        class BioBlock {
+            constructor(x, y, z, rotation, isReused = false, generation = 0) {
+                this.isReused = isReused;
+                this.generation = generation;
+                this.isRemoving = false;
+                this.targetPosition = null;
+                this.animationProgress = 0;
+                this.pulsePhase = Math.random() * Math.PI * 2;
+                this.growthFactor = 0;
+                this.organicOffset = {
+                    x: (Math.random() - 0.5) * 0.1,
+                    y: (Math.random() - 0.5) * 0.05,
+                    z: (Math.random() - 0.5) * 0.1
+                };
+                
+                // Parametric organic geometry
+                const geometry = this.createOrganicGeometry();
+                
+                // Bio-material shader
+                const material = new THREE.MeshStandardMaterial({
+                    color: this.getBioColor(generation),
+                    roughness: 0.6 - (generation * 0.05),
+                    metalness: 0.2 + (generation * 0.1),
+                    emissive: this.getBioColor(generation),
+                    emissiveIntensity: isReused ? 0.3 + (generation * 0.05) : 0.1,
+                    transparent: true,
+                    opacity: 0.95
+                });
+                
+                this.mesh = new THREE.Mesh(geometry, material);
+                this.mesh.position.set(
+                    x + this.organicOffset.x,
+                    y + this.organicOffset.y,
+                    z + this.organicOffset.z
+                );
+                this.mesh.rotation.y = rotation + (Math.random() - 0.5) * 0.05;
+                this.mesh.castShadow = true;
+                this.mesh.receiveShadow = true;
+                this.mesh.userData.block = this;
+                
+                // Add bio-growth particles
+                this.createBioParticles();
+                
+                scene.add(this.mesh);
+                
+                // Animate growth
+                this.animateGrowth();
+            }
+
+            createOrganicGeometry() {
+                // Start with box geometry but will morph if reused
+                const geometry = new THREE.BoxGeometry(
+                    BLOCK_LENGTH, 
+                    BLOCK_HEIGHT, 
+                    BLOCK_WIDTH,
+                    8, 2, 4
+                );
+                
+                // Add organic deformation
+                const positions = geometry.attributes.position;
+                for (let i = 0; i < positions.count; i++) {
+                    const x = positions.getX(i);
+                    const y = positions.getY(i);
+                    const z = positions.getZ(i);
+                    
+                    const noise = Math.sin(x * 2) * Math.cos(z * 2) * 0.05;
+                    positions.setY(i, y + noise);
+                    
+                    const edgeNoise = (Math.random() - 0.5) * 0.03;
+                    positions.setX(i, x + edgeNoise);
+                    positions.setZ(i, z + edgeNoise);
+                }
+                
+                geometry.computeVertexNormals();
+                return geometry;
+            }
+
+            createBlobGeometry() {
+                // Create organic blob shape for reused blocks
+                const geometry = new THREE.SphereGeometry(
+                    BLOCK_LENGTH * 0.4,
+                    16,
+                    12
+                );
+                
+                // Deform sphere into organic blob
+                const positions = geometry.attributes.position;
+                for (let i = 0; i < positions.count; i++) {
+                    const x = positions.getX(i);
+                    const y = positions.getY(i);
+                    const z = positions.getZ(i);
+                    
+                    // Create blobby distortions
+                    const distortion = 1 + Math.sin(x * 3) * Math.cos(y * 4) * Math.sin(z * 2) * 0.3;
+                    const randomness = 0.85 + Math.random() * 0.3;
+                    
+                    positions.setX(i, x * distortion * randomness);
+                    positions.setY(i, y * distortion * randomness * 0.7);
+                    positions.setZ(i, z * distortion * randomness);
+                }
+                
+                geometry.computeVertexNormals();
+                return geometry;
+            }
+
+            morphToBlob() {
+                // Replace geometry with blob
+                const oldGeometry = this.mesh.geometry;
+                this.mesh.geometry = this.createBlobGeometry();
+                oldGeometry.dispose();
+                
+                // Update material for blob
+                this.mesh.material.roughness = 0.3;
+                this.mesh.material.metalness = 0.5;
+                this.mesh.material.emissiveIntensity = 0.4;
+            }
+
+            getBioColor(gen) {
+                const colors = [
+                    0x8b7355,  // Original wood
+                    0x00ff88,  // Primary bio
+                    0x00ffff,  // Cyan growth
+                    0xff00ff,  // Magenta evolution
+                    0xffff00,  // Yellow maturity
+                    0xff6b00,  // Orange advanced
+                    0xff0066,  // Pink ultimate
+                    0x00ff00,  // Pure green
+                ];
+                return colors[Math.min(gen, colors.length - 1)];
+            }
+
+            createBioParticles() {
+                const particleCount = 30;
+                const pGeometry = new THREE.BufferGeometry();
+                const positions = new Float32Array(particleCount * 3);
+                
+                for (let i = 0; i < particleCount * 3; i += 3) {
+                    positions[i] = (Math.random() - 0.5) * BLOCK_LENGTH;
+                    positions[i + 1] = (Math.random() - 0.5) * BLOCK_HEIGHT;
+                    positions[i + 2] = (Math.random() - 0.5) * BLOCK_WIDTH;
+                }
+                
+                pGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+                const pMaterial = new THREE.PointsMaterial({
+                    color: this.getBioColor(this.generation),
+                    size: 0.05,
+                    transparent: true,
+                    opacity: 0.6,
+                    blending: THREE.AdditiveBlending
+                });
+                
+                this.particles = new THREE.Points(pGeometry, pMaterial);
+                this.mesh.add(this.particles);
+            }
+
+            animateGrowth() {
+                const startScale = 0.1;
+                this.mesh.scale.set(startScale, startScale, startScale);
+                
+                const growthAnimation = setInterval(() => {
+                    this.growthFactor += 0.05;
+                    const scale = startScale + (1 - startScale) * this.easeOutElastic(this.growthFactor);
+                    this.mesh.scale.set(scale, scale, scale);
+                    
+                    if (this.growthFactor >= 1) {
+                        clearInterval(growthAnimation);
+                        this.mesh.scale.set(1, 1, 1);
+                    }
+                }, 16);
+            }
+
+            easeOutElastic(x) {
+                const c4 = (2 * Math.PI) / 3;
+                return x === 0 ? 0 : x === 1 ? 1 : 
+                    Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1;
+            }
+
+            update(time) {
+                // Organic breathing/pulsing
+                const pulse = Math.sin(time * 2 + this.pulsePhase) * 0.02;
+                this.mesh.scale.y = 1 + pulse;
+                
+                // Bio-luminescent pulsing
+                this.mesh.material.emissiveIntensity = 
+                    (this.isReused ? 0.3 : 0.1) + Math.sin(time * 3 + this.pulsePhase) * 0.1;
+                
+                // Particle animation
+                if (this.particles) {
+                    this.particles.rotation.y += 0.01;
+                }
+            }
+
+            remove() {
+                scene.remove(this.mesh);
+            }
+
+            startAnimation(targetX, targetY, targetZ, targetRotation) {
+                this.isRemoving = true;
+                this.animationProgress = 0;
+                this.startPosition = this.mesh.position.clone();
+                this.startRotation = this.mesh.rotation.y;
+                this.targetPosition = new THREE.Vector3(targetX, targetY, targetZ);
+                this.targetRotation = targetRotation;
+                
+                // Increase generation
+                this.generation++;
+                this.mesh.material.color.setHex(this.getBioColor(this.generation));
+                this.mesh.material.emissive.setHex(this.getBioColor(this.generation));
+            }
+
+            updateAnimation() {
+                if (!this.isRemoving) return false;
+
+                this.animationProgress += 0.015;
+
+                if (this.animationProgress >= 1) {
+                    this.mesh.position.copy(this.targetPosition);
+                    this.mesh.rotation.y = this.targetRotation;
+                    this.mesh.rotation.x = 0;
+                    this.mesh.rotation.z = 0;
+                    this.isRemoving = false;
+                    this.isReused = true;
+                    
+                    // Transform into blob after landing
+                    this.morphToBlob();
+                    
+                    return true;
+                }
+
+                const t = this.easeInOutCubic(this.animationProgress);
+                
+                // Spiral motion
+                const spiralRadius = 5;
+                const spiralAngle = this.animationProgress * Math.PI * 4;
+                const spiralX = Math.cos(spiralAngle) * spiralRadius * (1 - t);
+                const spiralZ = Math.sin(spiralAngle) * spiralRadius * (1 - t);
+                
+                this.mesh.position.lerpVectors(this.startPosition, this.targetPosition, t);
+                this.mesh.position.x += spiralX;
+                this.mesh.position.z += spiralZ;
+                
+                // Arc motion
+                const arcHeight = 8;
+                this.mesh.position.y += Math.sin(t * Math.PI) * arcHeight;
+                
+                // Rotation during flight
+                this.mesh.rotation.y = this.startRotation + (this.targetRotation - this.startRotation) * t;
+                this.mesh.rotation.x = Math.sin(t * Math.PI * 2) * 0.5;
+                this.mesh.rotation.z = Math.cos(t * Math.PI * 2) * 0.3;
+                
+                return false;
+            }
+
+            easeInOutCubic(t) {
+                return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+            }
+        }
+
+        // Build initial bio-structure
+        function buildInitialTower() {
+            // Create structural system first
+            createStructuralSystem(INITIAL_LEVELS);
+            
+            // Create facade
+            createBuildingFacade(INITIAL_LEVELS);
+            
+            // Then add bio-blocks on each floor
+            for (let level = 0; level < INITIAL_LEVELS; level++) {
+                addLevel(level, false, 0);
+            }
+            currentLevel = INITIAL_LEVELS;
+        }
+
+        function addLevel(level, isReused, generation) {
+            const y = level * FLOOR_HEIGHT + SLAB_THICKNESS; // Place blocks on top of floor slab
+            const rotation = (level % 2) * Math.PI / 2;
+            const isHorizontal = level % 2 === 0;
+
+            for (let i = 0; i < BLOCKS_PER_LEVEL; i++) {
+                let x, z;
+                if (isHorizontal) {
+                    x = 0;
+                    z = (i - 1) * BLOCK_WIDTH;
+                } else {
+                    x = (i - 1) * BLOCK_WIDTH;
+                    z = 0;
+                }
+
+                const block = new BioBlock(x, y, z, rotation, isReused, generation);
+                jengaBlocks.push(block);
+            }
+        }
+
+        // Raycaster for interaction
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+        let hoveredBlock = null;
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(jengaBlocks.map(b => b.mesh));
+
+            if (hoveredBlock && !hoveredBlock.isRemoving) {
+                hoveredBlock.mesh.material.emissiveIntensity = hoveredBlock.isReused ? 0.3 : 0.1;
+            }
+
+            if (intersects.length > 0 && !isAnimating) {
+                hoveredBlock = intersects[0].object.userData.block;
+                if (!hoveredBlock.isRemoving) {
+                    hoveredBlock.mesh.material.emissiveIntensity = 0.6;
+                }
+            } else {
+                hoveredBlock = null;
+            }
+        }
+
+        function onMouseClick(event) {
+            if (isAnimating || !hoveredBlock || hoveredBlock.isRemoving) return;
+            harvestAndRegenerate(hoveredBlock);
+        }
+
+        function harvestAndRegenerate(block) {
+            isAnimating = true;
+            removedCount++;
+            reusedCount++;
+
+            const topLevel = currentLevel;
+            const y = topLevel * FLOOR_HEIGHT + SLAB_THICKNESS;
+            const rotation = (topLevel % 2) * Math.PI / 2;
+            const isHorizontal = topLevel % 2 === 0;
+
+            const blocksInTopLevel = jengaBlocks.filter(b => 
+                Math.abs(b.mesh.position.y - y) < 0.5 && !b.isRemoving
+            ).length;
+
+            let x, z;
+            if (isHorizontal) {
+                x = 0;
+                z = (blocksInTopLevel - 1) * BLOCK_WIDTH;
+            } else {
+                x = (blocksInTopLevel - 1) * BLOCK_WIDTH;
+                z = 0;
+            }
+
+            block.startAnimation(x, y, z, rotation);
+
+            if (blocksInTopLevel + 1 >= BLOCKS_PER_LEVEL) {
+                currentLevel++;
+                // Update structural system for new level
+                updateStructuralSystem(currentLevel);
+            }
+
+            updateStats();
+            updateEnvironmentalMetrics();
+            updateCarbonDisplay(); // Recalculate carbon when building grows
+        }
+
+        function updateStats() {
+            // Stats removed - keeping function for compatibility
+        }
+
+        function updateEnvironmentalMetrics() {
+            // Environmental metrics removed - keeping function for compatibility
+        }
+
+        // Camera controls
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let cameraAngle = 0.8;
+        let cameraHeight = 35;
+        let cameraDistance = 60;
+
+        function onMouseDown(event) {
+            isDragging = true;
+            previousMousePosition = { x: event.clientX, y: event.clientY };
+        }
+
+        function onMouseDrag(event) {
+            if (!isDragging) return;
+
+            const deltaX = event.clientX - previousMousePosition.x;
+            const deltaY = event.clientY - previousMousePosition.y;
+
+            cameraAngle -= deltaX * 0.01;
+            cameraHeight = Math.max(5, Math.min(60, cameraHeight - deltaY * 0.1));
+
+            previousMousePosition = { x: event.clientX, y: event.clientY };
+        }
+
+        function onMouseUp() {
+            isDragging = false;
+        }
+
+        function onWheel(event) {
+            cameraDistance = Math.max(20, Math.min(80, cameraDistance + event.deltaY * 0.05));
+        }
+
+        // Event listeners
+        window.addEventListener('mousemove', onMouseMove);
+        window.addEventListener('click', onMouseClick);
+        window.addEventListener('mousedown', onMouseDown);
+        window.addEventListener('mousemove', onMouseDrag);
+        window.addEventListener('mouseup', onMouseUp);
+        window.addEventListener('wheel', onWheel);
+
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+
+        // Main animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            time += 0.01;
+
+            // Update camera with smooth orbiting - adjusted for skyscraper scale
+            camera.position.x = Math.cos(cameraAngle) * cameraDistance;
+            camera.position.z = Math.sin(cameraAngle) * cameraDistance;
+            camera.position.y = cameraHeight;
+            camera.lookAt(0, currentLevel * FLOOR_HEIGHT / 2, 0);
+
+            // Animate bio-lights
+            bioLight1.position.x = Math.cos(time * 0.5) * 15;
+            bioLight1.position.z = Math.sin(time * 0.5) * 15;
+            bioLight1.position.y = 20 + Math.sin(time) * 5;
+            bioLight1.intensity = 0.8 + Math.sin(time * 2) * 0.2;
+
+            bioLight2.position.x = Math.cos(time * 0.7 + Math.PI) * 12;
+            bioLight2.position.z = Math.sin(time * 0.7 + Math.PI) * 12;
+            bioLight2.position.y = 15 + Math.cos(time * 1.5) * 5;
+            bioLight2.intensity = 0.6 + Math.sin(time * 3) * 0.2;
+
+            // Update particle system based on carbon behavior
+            const positions = particleGeometry.attributes.position.array;
+            const buildingCenter = new THREE.Vector3(0, currentLevel * FLOOR_HEIGHT / 2, 0);
+            const maxHeight = currentLevel * FLOOR_HEIGHT + 10;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                positions[i3] += particleVelocities[i].x;
+                positions[i3 + 1] += particleVelocities[i].y;
+                positions[i3 + 2] += particleVelocities[i].z;
+
+                if (currentCarbonLevel < 0) {
+                    // Carbon negative: particles get absorbed by building
+                    const particlePos = new THREE.Vector3(positions[i3], positions[i3 + 1], positions[i3 + 2]);
+                    const distance = particlePos.distanceTo(buildingCenter);
+                    
+                    // Reset if too close to building (absorbed)
+                    if (distance < 5) {
+                        positions[i3] = (Math.random() - 0.5) * 100;
+                        positions[i3 + 1] = Math.random() * maxHeight;
+                        positions[i3 + 2] = (Math.random() - 0.5) * 100;
+                    }
+                } else {
+                    // Carbon positive: particles rise and respawn at bottom (emissions)
+                    if (positions[i3 + 1] > maxHeight) {
+                        positions[i3 + 1] = 0;
+                        positions[i3] = (Math.random() - 0.5) * 20; // Spawn near building
+                        positions[i3 + 2] = (Math.random() - 0.5) * 20;
+                    }
+                }
+                
+                // Keep particles in bounds horizontally
+                if (Math.abs(positions[i3]) > 50) {
+                    positions[i3] = (Math.random() - 0.5) * 100;
+                }
+                if (Math.abs(positions[i3 + 2]) > 50) {
+                    positions[i3 + 2] = (Math.random() - 0.5) * 100;
+                }
+            }
+            
+            // Hide inactive particles by moving them far away
+            for (let i = particleCount; i < maxParticles; i++) {
+                const i3 = i * 3;
+                positions[i3] = 10000;
+                positions[i3 + 1] = 10000;
+                positions[i3 + 2] = 10000;
+            }
+            
+            particleGeometry.attributes.position.needsUpdate = true;
+
+            // Animate mycelium network
+            myceliumLines.forEach((line, index) => {
+                line.material.opacity = 0.1 + Math.sin(time * 2 + index * 0.1) * 0.05;
+            });
+
+            // Animate floor slabs
+            floorSlabs.forEach(slab => {
+                slab.pulse(time);
+            });
+
+            // Update all blocks
+            let allAnimationsComplete = true;
+            for (const block of jengaBlocks) {
+                block.update(time);
+                if (block.isRemoving) {
+                    const complete = block.updateAnimation();
+                    if (!complete) allAnimationsComplete = false;
+                }
+            }
+
+            if (allAnimationsComplete && isAnimating) {
+                isAnimating = false;
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Initialize
+        buildInitialTower();
+        updateCarbonDisplay(); // Initial carbon calculation
+        animate();
+        setInterval(updateEnvironmentalMetrics, 3000);
+    </script>
+</body>
+</html>
